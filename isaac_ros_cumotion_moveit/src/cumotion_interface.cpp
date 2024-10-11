@@ -71,14 +71,14 @@ bool CumotionInterface::solve(
 
   if (!action_client_->success) {
     RCLCPP_ERROR(node_->get_logger(), "No trajectory");
-    response.error_code_.val = moveit_msgs::msg::MoveItErrorCodes::PLANNING_FAILED;
+    response.error_code.val = moveit_msgs::msg::MoveItErrorCodes::PLANNING_FAILED;
     planner_busy = false;
     return false;
   }
   RCLCPP_INFO(node_->get_logger(), "Trajectory success!");
 
-  response.error_code_ = action_client_->plan_response.error_code;
-  response.description_ = action_client_->plan_response.description;
+  response.error_code = action_client_->plan_response.error_code;
+  response.description = action_client_->plan_response.description;
   auto result_traj = std::make_shared<robot_trajectory::RobotTrajectory>(
     planning_scene->getRobotModel(), request.group_name);
   moveit::core::RobotState robot_state(planning_scene->getRobotModel());
@@ -88,9 +88,9 @@ bool CumotionInterface::solve(
   result_traj->setRobotTrajectoryMsg(
     robot_state,
     action_client_->plan_response.trajectory[0]);
-  response.trajectory_.clear();
-  response.trajectory_.push_back(result_traj);
-  response.processing_time_ = action_client_->plan_response.processing_time;
+  response.trajectory.clear();
+  response.trajectory.push_back(result_traj);
+  response.processing_time = action_client_->plan_response.processing_time;
 
   planner_busy = false;
   return true;
