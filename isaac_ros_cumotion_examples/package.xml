@@ -9,7 +9,6 @@
   <url type="website">https://developer.nvidia.com/isaac-ros-gems/</url>
 
   <exec_depend>isaac_ros_cumotion_moveit</exec_depend>
-  <exec_depend>moveit2_tutorials</exec_depend>
   <exec_depend>ros2launch</exec_depend>
   <exec_depend>ur_moveit_config</exec_depend>
 

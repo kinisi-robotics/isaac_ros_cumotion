@@ -565,6 +565,7 @@ class CumotionActionServer(Node):
                 )
             )
             goal_pose = self.motion_gen.compute_kinematics(goal_state).ee_pose.clone()
+            self.get_logger().info(f'Cumotion Desired Pose Position: {goal_pose}')
         elif (
             len(plan_req.goal_constraints[0].position_constraints) > 0
             and len(plan_req.goal_constraints[0].orientation_constraints) > 0
@@ -582,6 +583,7 @@ class CumotionActionServer(Node):
             orientation = [orientation.w, orientation.x, orientation.y, orientation.z]
             pose_list = position + orientation
             goal_pose = Pose.from_list(pose_list, tensor_args=self.tensor_args)
+            self.get_logger().info(f'Cumotion Desired Pose orientation: {goal_pose}')
 
             # Check if link names match:
             position_link_name = plan_req.goal_constraints[0].position_constraints[0].link_name

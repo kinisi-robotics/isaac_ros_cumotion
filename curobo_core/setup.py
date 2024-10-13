@@ -22,7 +22,7 @@ package_name = 'curobo_core'
 
 extra_cuda_args = {
     'nvcc': [
-        '--threads=8',
+        '--threads=20',
         '-O3',
         '--ftz=true',
         '--fmad=true',
