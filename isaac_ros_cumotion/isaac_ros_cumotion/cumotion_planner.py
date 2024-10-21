@@ -9,6 +9,7 @@
 
 from os import path
 import time
+from copy import deepcopy
 
 from ament_index_python.packages import get_package_share_directory
 from curobo.geom.sdf.world import CollisionCheckerType
@@ -549,23 +550,24 @@ class CumotionActionServer(Node):
 
         if len(plan_req.goal_constraints[0].joint_constraints) > 0:
             self.get_logger().info('Calculating goal pose from Joint target')
-            goal_config = [
-                plan_req.goal_constraints[0].joint_constraints[x].position
-                for x in range(len(plan_req.goal_constraints[0].joint_constraints))
-            ]
-            goal_jnames = [
-                plan_req.goal_constraints[0].joint_constraints[x].joint_name
-                for x in range(len(plan_req.goal_constraints[0].joint_constraints))
-            ]
 
+            assert len(plan_req.start_state.joint_state.name) > 0
+            goal_jnames = plan_req.start_state.joint_state.name
+            goal_config = plan_req.start_state.joint_state.position
+            for joint_constraint in plan_req.goal_constraints[0].joint_constraints:
+                idx = goal_jnames.index(joint_constraint.joint_name)
+                goal_config[idx] = joint_constraint.position
             goal_state = self.motion_gen.get_active_js(
                 CuJointState.from_position(
                     position=self.tensor_args.to_device(goal_config).view(1, -1),
                     joint_names=goal_jnames,
                 )
             )
-            goal_pose = self.motion_gen.compute_kinematics(goal_state).ee_pose.clone()
+            kinamatics = self.motion_gen.compute_kinematics(goal_state)
+            goal_pose = kinamatics.ee_pose.clone()
+            goal_link_poses = deepcopy(kinamatics.link_poses)
             self.get_logger().info(f'Cumotion Desired Pose Position: {goal_pose}')
+
         elif (
             len(plan_req.goal_constraints[0].position_constraints) > 0
             and len(plan_req.goal_constraints[0].orientation_constraints) > 0
@@ -621,6 +623,7 @@ class CumotionActionServer(Node):
             goal_pose,
             MotionGenPlanConfig(max_attempts=5, enable_graph_attempt=1,
                                 time_dilation_factor=time_dilation_factor),
+            link_poses=goal_link_poses
         )
 
         result = MoveGroup.Result()
