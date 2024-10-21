@@ -49,6 +49,8 @@ public:
 
   void getGoal();
 
+  bool ready();
+
   bool result_ready;
   bool success;
   moveit_msgs::msg::MotionPlanDetailedResponse plan_response;

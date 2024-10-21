@@ -80,11 +80,6 @@ bool CumotionMoveGroupClient::sendGoal()
   moveit_msgs::msg::PlanningOptions plan_options;
   plan_options.planning_scene_diff = planning_scene_;
 
-  if (!client_->wait_for_action_server()) {
-    RCLCPP_ERROR(node_->get_logger(), "Action server not available after waiting");
-    rclcpp::shutdown();
-  }
-
   auto goal_msg = moveit_msgs::action::MoveGroup::Goal();
 
   goal_msg.planning_options = plan_options;
@@ -204,6 +199,9 @@ void CumotionMoveGroupClient::resultCallback(const GoalHandle::WrappedResult & r
   }
 }
 
-}  // namespace manipulation
+bool CumotionMoveGroupClient::ready() {
+  return client_->wait_for_action_server(std::chrono::seconds(0));
+}
+} // namespace manipulation
 }  // namespace isaac
 }  // namespace nvidia

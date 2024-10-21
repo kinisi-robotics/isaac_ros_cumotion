@@ -45,6 +45,12 @@ bool CumotionInterface::solve(
   const planning_interface::MotionPlanRequest & request,
   planning_interface::MotionPlanDetailedResponse & response)
 {
+  if (!action_client_->ready()) {
+    RCLCPP_ERROR(node_->get_logger(), "Client not ready");
+    response.error_code.val = moveit_msgs::msg::MoveItErrorCodes::FAILURE;
+    return false;
+  }
+
   RCLCPP_INFO(node_->get_logger(), "Planning trajectory");
 
   if (!planner_busy) {
